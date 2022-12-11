@@ -8,7 +8,6 @@ type User struct {
 	PasswordHash string
 	Avatar       string
 	Role         string
-	Token        string
 	CreatedAt    int64
 	UpdatedAt    int64
 }

@@ -68,20 +68,20 @@ func createUser(c *gin.Context) {
 	}
 
 	userRepository := user.NewRepository(db)
-	user := user.User{
-		Name:         "setiawan",
-		Occupation:   "bantul",
-		PasswordHash: "ashfkjahsdfjkahsdfk",
-		Role:         "admin",
-		Avatar:       "tes.png",
-		Token:        "sadlkfjalk;sjfl;kds",
-		CreatedAt:    1670746838,
-		UpdatedAt:    1670746838,
+	userService := user.NewService(userRepository)
+
+	userInput := user.RegisterInput{
+		Name:       "setiawan",
+		Email:      "anis@gmail.com",
+		Occupation: "bantul",
+		Password:   "password",
 	}
-	userRepository.Save(user)
+
+	response, _ := userService.RegisterUser(userInput)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "pong",
-		"user":    user,
+		"message": "success",
+		"code":    201,
+		"user":    response,
 	})
 }
