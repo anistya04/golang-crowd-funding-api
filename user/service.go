@@ -9,6 +9,9 @@ type Service interface {
 	RegisterInput(input RegisterInput) (User, error)
 }
 
+// // validate interface is implement
+var _ Service = (*service)(nil)
+
 type service struct {
 	repository Repository
 }
@@ -17,7 +20,7 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) RegisterUser(input RegisterInput) (User, error) {
+func (s *service) RegisterInput(input RegisterInput) (User, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	user := User{}
 

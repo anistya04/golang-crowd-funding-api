@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/http"
+	"vuegolang/handler"
 	"vuegolang/user"
 )
 
@@ -31,13 +32,13 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.GET("/", handler)
+	router.GET("/", handler2)
 	router.POST("/user", createUser)
-	router.Run()
+	router.Run("127.0.0.1:8080")
 
 }
 
-func handler(c *gin.Context) {
+func handler2(c *gin.Context) {
 	dbName := "vuegolang"
 	dsn := "root:@tcp(127.0.0.1:3306)/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -69,19 +70,13 @@ func createUser(c *gin.Context) {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
 
-	userInput := user.RegisterInput{
-		Name:       "setiawan",
-		Email:      "anis@gmail.com",
-		Occupation: "bantul",
-		Password:   "password",
-	}
-
-	response, _ := userService.RegisterUser(userInput)
+	response, _ := userHandler.RegisterUser(c)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "success",
-		"code":    201,
-		"user":    response,
+		"code":    200,
+		"data":    response,
 	})
 }
