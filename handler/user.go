@@ -23,12 +23,13 @@ func (h *userHandler) RegisterUser(c *gin.Context) helper.Response {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, nil)
+		return helper.ApiResponse("failed to register user", http.StatusBadRequest, "error", nil)
 	}
 
 	data, err := h.userService.RegisterInput(input)
 
 	if err != nil {
-		panic(err)
+		return helper.ApiResponse("failed to register user", http.StatusBadRequest, "error", nil)
 	}
 
 	// to do
