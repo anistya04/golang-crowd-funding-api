@@ -1,8 +1,10 @@
 package helper
 
+import "github.com/go-playground/validator/v10"
+
 type Response struct {
-	Meta Meta        `json:"meta"`
-	Data interface{} `json:"data"`
+	Meta Meta `json:"meta"`
+	Data any  `json:"data"`
 }
 
 type Meta struct {
@@ -11,7 +13,7 @@ type Meta struct {
 	Status  string
 }
 
-func ApiResponse(message string, code int, status string, data interface{}) Response {
+func ApiResponse(message string, code int, status string, data any) Response {
 	meta := Meta{
 		Message: message,
 		Code:    code,
@@ -24,4 +26,14 @@ func ApiResponse(message string, code int, status string, data interface{}) Resp
 	}
 
 	return jsonResponse
+}
+
+func ErrorResponse(err error) []string {
+	var errors []string
+
+	for _, e := range err.(validator.ValidationErrors) {
+		errors = append(errors, e.Error())
+	}
+
+	return errors
 }
