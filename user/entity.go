@@ -1,7 +1,7 @@
 package user
 
 type User struct {
-	Id           uint16
+	Id           uint64
 	Name         string
 	Email        string
 	Occupation   string

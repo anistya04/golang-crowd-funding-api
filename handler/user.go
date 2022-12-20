@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"vuegolang/helper"
 	"vuegolang/user"
 )
 
@@ -14,7 +15,7 @@ func NewUserHandler(userService user.Service) *userHandler {
 	return &userHandler{userService}
 }
 
-func (h *userHandler) RegisterUser(c *gin.Context) (user.User, error) {
+func (h *userHandler) RegisterUser(c *gin.Context) helper.Response {
 
 	var input user.RegisterInput
 
@@ -25,10 +26,16 @@ func (h *userHandler) RegisterUser(c *gin.Context) (user.User, error) {
 	}
 
 	data, err := h.userService.RegisterInput(input)
+
 	if err != nil {
-		return data, err
+		panic(err)
 	}
 
-	return data, nil
+	// to do
+	// create jwt for user authenticate
+	token := "wigwags"
 
+	formatter := user.JsonFormat(data, token)
+
+	return helper.ApiResponse("user successfully registered", 201, "success", formatter)
 }

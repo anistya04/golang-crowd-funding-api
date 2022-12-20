@@ -72,11 +72,7 @@ func createUser(c *gin.Context) {
 	userService := user.NewService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 
-	response, _ := userHandler.RegisterUser(c)
+	response := userHandler.RegisterUser(c)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "success",
-		"code":    200,
-		"data":    response,
-	})
+	c.JSON(http.StatusOK, response)
 }
