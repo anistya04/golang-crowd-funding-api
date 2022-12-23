@@ -7,10 +7,11 @@ import (
 
 type Service interface {
 	RegisterInput(input RegisterInput) (User, error)
+	Login(input LoginInput) (User, error)
 }
 
-// // validate interface is implement
-var _ Service = (*service)(nil)
+//// validate interface is implement
+//var _ Service = (*service)(nil)
 
 type service struct {
 	repository Repository
@@ -43,4 +44,21 @@ func (s *service) RegisterInput(input RegisterInput) (User, error) {
 	}
 
 	return newUser, nil
+}
+
+func (s *service) Login(input LoginInput) (User, error) {
+
+	existedUser, err := s.repository.FindByEmail(input.Email)
+
+	if err != nil {
+		return existedUser, err
+	}
+
+	errorBcrypt := bcrypt.CompareHashAndPassword([]byte(existedUser.PasswordHash), []byte(input.Password))
+
+	if errorBcrypt != nil {
+		return existedUser, err
+	}
+
+	return existedUser, nil
 }

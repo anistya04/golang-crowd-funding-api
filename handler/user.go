@@ -44,3 +44,32 @@ func (h *userHandler) RegisterUser(c *gin.Context) helper.Response {
 
 	return helper.ApiResponse("user successfully registered", 201, "success", formatter)
 }
+
+func (h *userHandler) Login(c *gin.Context) helper.Response {
+	var input user.LoginInput
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		errors := helper.ErrorResponse(err)
+		errorMessages := gin.H{
+			"errors": errors,
+		}
+
+		return helper.ApiResponse("failed to login user", http.StatusUnprocessableEntity, "error", errorMessages)
+	}
+
+	data, err := h.userService.Login(input)
+
+	if err != nil {
+		return helper.ApiResponse("failed to login user", http.StatusBadRequest, "error", nil)
+	}
+
+	// to do
+	// create jwt for user authenticate
+	token := "wigwags"
+
+	formatter := user.JsonFormat(data, token)
+
+	return helper.ApiResponse("user successfully logged in", 200, "success", formatter)
+}
