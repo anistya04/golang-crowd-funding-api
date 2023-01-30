@@ -8,6 +8,7 @@ import (
 type Service interface {
 	RegisterInput(input RegisterInput) (User, error)
 	Login(input LoginInput) (User, error)
+	CheckExistedUserByEmail(input UniqueEmailInput) (bool, error)
 }
 
 //// validate interface is implement
@@ -61,4 +62,16 @@ func (s *service) Login(input LoginInput) (User, error) {
 	}
 
 	return existedUser, nil
+}
+
+func (s *service) CheckExistedUserByEmail(input UniqueEmailInput) (bool, error) {
+	email := input.Email
+
+	existedUser, err := s.repository.FindByEmail(email)
+
+	if existedUser.Id == 0 {
+		return true, err
+	}
+
+	return false, nil
 }
