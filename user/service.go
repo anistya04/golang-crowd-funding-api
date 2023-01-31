@@ -9,6 +9,7 @@ type Service interface {
 	RegisterInput(input RegisterInput) (User, error)
 	Login(input LoginInput) (User, error)
 	CheckExistedUserByEmail(input UniqueEmailInput) (bool, error)
+	SaveAvatar(Id int, fileLocation string) (User, error)
 }
 
 //// validate interface is implement
@@ -74,4 +75,17 @@ func (s *service) CheckExistedUserByEmail(input UniqueEmailInput) (bool, error) 
 	}
 
 	return false, nil
+}
+
+func (s *service) SaveAvatar(Id int, fileLocation string) (User, error) {
+	user, err := s.repository.FindById(Id)
+
+	if err != nil {
+		return user, err
+	}
+
+	user.Avatar = fileLocation
+	s.repository.Update(user)
+
+	return user, nil
 }

@@ -15,6 +15,7 @@ func main() {
 	router.POST("/user", createUser)
 	router.POST("/login", login)
 	router.POST("/user/check-email-availability", checkEmailAvailability)
+	router.POST("/user/upload-avatar", uploadAvatar)
 	router.Run("127.0.0.1:8080")
 
 }
@@ -90,4 +91,19 @@ func checkEmailAvailability(c *gin.Context) {
 	response := userHandler.CheckEmailAvailability(c)
 
 	c.JSON(http.StatusOK, response)
+}
+
+func uploadAvatar(c *gin.Context) {
+	dbName := "vuegolang"
+	dsn := "root:@tcp(127.0.0.1:3306)/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	userRepository := user.NewRepository(db)
+	userService := user.NewService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+
+	userHandler.UploadAvatar(c)
 }

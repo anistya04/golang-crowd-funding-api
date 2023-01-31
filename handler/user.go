@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"vuegolang/helper"
 	"vuegolang/user"
 )
@@ -108,4 +110,29 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) helper.Response {
 	}
 
 	return helper.ApiResponse("Email Available to use", http.StatusOK, "success", data)
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+		response := helper.ApiResponse("failed to upload avatar", http.StatusBadRequest, "err", gin.H{"is_uploaded": false})
+		c.JSON(http.StatusBadRequest, response)
+	}
+	// id from jwt
+	userID := 1
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+	c.SaveUploadedFile(file, path)
+
+	_, err = h.userService.SaveAvatar(userID, path)
+
+	if err != nil {
+		os.Remove(path)
+		response := helper.ApiResponse("failed to upload avatar", http.StatusBadRequest, "err", gin.H{"is_uploaded": false})
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	response := helper.ApiResponse("Success to upload avatar", http.StatusOK, "success", gin.H{"is_uploaded": true, "file_url": path})
+	c.JSON(http.StatusOK, response)
 }
