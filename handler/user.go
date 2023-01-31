@@ -100,16 +100,13 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) helper.Response {
 	}
 
 	message := true
-	data := gin.H{
-		"is_available": message,
-	}
 
 	if isEmailAvailable == false {
 		message = false
-		return helper.ApiResponse("Email is already exist", http.StatusUnprocessableEntity, "error", data)
+		return helper.ApiResponse("Email is already exist", http.StatusUnprocessableEntity, "error", gin.H{"is_available": message})
 	}
 
-	return helper.ApiResponse("Email Available to use", http.StatusOK, "success", data)
+	return helper.ApiResponse("Email Available to use", http.StatusOK, "success", gin.H{"is_available": true})
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
