@@ -89,3 +89,13 @@ func (s *service) SaveAvatar(Id int, fileLocation string) (User, error) {
 
 	return user, nil
 }
+
+func (s *service) GetByID(Id int) (User, error) {
+	user, err := s.repository.FindById(Id)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}

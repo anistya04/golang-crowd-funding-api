@@ -5,16 +5,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"vuegolang/auth"
 	"vuegolang/helper"
 	"vuegolang/user"
 )
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) helper.Response {
@@ -67,9 +69,15 @@ func (h *userHandler) Login(c *gin.Context) helper.Response {
 		return helper.ApiResponse("failed to login user", http.StatusBadRequest, "error", nil)
 	}
 
-	// to do
 	// create jwt for user authenticate
-	token := "wigwags"
+	token, er := h.authService.GenerateToken(data.Id)
+
+	if er != nil {
+		errorMessages := gin.H{
+			"errors": er.Error(),
+		}
+		return helper.ApiResponse("failed to login user", http.StatusBadRequest, "error", errorMessages)
+	}
 
 	formatter := user.JsonFormat(data, token)
 
@@ -116,13 +124,14 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		response := helper.ApiResponse("failed to upload avatar", http.StatusBadRequest, "err", gin.H{"is_uploaded": false})
 		c.JSON(http.StatusBadRequest, response)
 	}
+	
 	// id from jwt
-	userID := 1
+	userID := c.MustGet("currentUser").(user.User).Id
 
 	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
 	c.SaveUploadedFile(file, path)
 
-	_, err = h.userService.SaveAvatar(userID, path)
+	_, err = h.userService.SaveAvatar(int(userID), path)
 
 	if err != nil {
 		os.Remove(path)
