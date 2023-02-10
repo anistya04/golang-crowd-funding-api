@@ -9,12 +9,14 @@ import (
 	"net/http"
 	"strings"
 	"vuegolang/auth"
+	"vuegolang/campaign"
 	"vuegolang/handler"
 	"vuegolang/helper"
 	"vuegolang/user"
 )
 
 func main() {
+	// load .env
 	err := godotenv.Load()
 	if err != nil {
 		panic("Error loading .env file")
@@ -26,6 +28,10 @@ func main() {
 	router.POST("/login", login)
 	router.POST("/user/check-email-availability", checkEmailAvailability)
 	router.POST("/user/upload-avatar", authMiddleware, uploadAvatar)
+
+	// campaigns
+	router.GET("/campaigns", authMiddleware, getAllCampaigns)
+
 	router.Run("127.0.0.1:8080")
 
 }
@@ -52,6 +58,7 @@ func handler2(c *gin.Context) {
 	//db
 }
 
+// USER
 func createUser(c *gin.Context) {
 	dbName := "vuegolang"
 	dsn := "root:@tcp(127.0.0.1:3306)/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
@@ -160,7 +167,7 @@ func authMiddleware(c *gin.Context) {
 	userId := int(claim["userId"].(float64))
 	userService := user.NewService(userRepository)
 
-	user, e := userService.GetByID(userId)
+	userData, e := userService.GetByID(userId)
 
 	if e != nil {
 		response := helper.ApiResponse("unauthorized", http.StatusUnauthorized, "error", nil)
@@ -168,5 +175,21 @@ func authMiddleware(c *gin.Context) {
 		return
 	}
 
-	c.Set("currentUser", user)
+	c.Set("currentUser", userData)
+}
+
+// CAMPAIGNS
+func getAllCampaigns(c *gin.Context) {
+	dbName := "vuegolang"
+	dsn := "root:@tcp(127.0.0.1:3306)/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	campaignRepository := campaign.NewRepository(db)
+	campaignService := campaign.NewService(campaignRepository)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
+
+	campaignHandler.FindAll(c)
 }

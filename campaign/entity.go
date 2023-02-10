@@ -1,7 +1,5 @@
 package campaign
 
-import "time"
-
 type Campaign struct {
 	Id               uint64 `json:"id"`
 	UserId           uint64 `json:"user_id"`
@@ -13,15 +11,16 @@ type Campaign struct {
 	Perks            string `json:"perks"`
 	Slug             string `json:"slug"`
 	BakerCount       uint   `json:"baker_count"`
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	CreatedAt        uint64
+	UpdatedAt        uint64
+	CampaignImages   []CampaignImages `json:"images" gorm:"foreignKey:CampaignId;references:id"`
 }
 
-type Image struct {
+type CampaignImages struct {
 	Id         uint64 `json:"id"`
 	CampaignId uint64 `json:"campaign_id"`
 	FileName   string `json:"file_name"`
 	IsPriority bool   `json:"is_priority"`
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	CreatedAt  uint64
+	UpdatedAt  uint64
 }
