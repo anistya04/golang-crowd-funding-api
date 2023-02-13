@@ -191,5 +191,5 @@ func getAllCampaigns(c *gin.Context) {
 	campaignService := campaign.NewService(campaignRepository)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
-	campaignHandler.FindAll(c)
+	campaignHandler.GetCampaigns(c)
 }
