@@ -31,7 +31,7 @@ func FormatSingleCampaign(c Campaign) Formatter {
 	return formatted
 }
 
-func FormattedCampaign(c []Campaign, formatSingleCampaigns func(Campaign) Formatter) []Formatter {
+func FormatCampaignCollection(c []Campaign, formatSingleCampaigns func(Campaign) Formatter) []Formatter {
 	var formatted []Formatter
 
 	for _, campaign := range c {
